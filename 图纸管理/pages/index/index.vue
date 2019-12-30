@@ -1,25 +1,13 @@
 <template>
-	<view class="g-flex-main">
+	<view class="g-flex-main" ref="home" id="home">
 		<view class="g-flex-column">
-			<view class="flex-col-3 bg-red">
+			<view class="flex-col-3" v-for="i in [0, 1, 2]" :key="i"
+				  v-bind:class="{'bg-disable': tasks.length <= i, 'bg-red': i === 0 && tasks.length > i, 'bg-orange': i === 1 && tasks.length > i, 'bg-green': i === 2 && tasks.length > i}"
+				  @click="openDetail(i)">
 				<view class="flex-middle">
-					<image class="home-img" src="../../static/1.png" mode="aspectFit"></image>
-					<view class="home-title">小胖墩1号</view>
-					<text class="home-sub-title">一个小胖墩</text>
-				</view>
-			</view>
-			<view class="flex-col-3 bg-orange">
-				<view class="flex-middle">
-					<image class="home-img" src="../../static/1.png" mode="aspectFit"></image>
-					<view class="home-title">小胖墩1号</view>
-					<text class="home-sub-title">一个小胖墩</text>
-				</view>
-			</view>
-			<view class="flex-col-3 bg-green">
-				<view class="flex-middle">
-					<image class="home-img" src="../../static/1.png" mode="aspectFit"></image>
-					<view class="home-title">小胖墩1号</view>
-					<text class="home-sub-title">一个小胖墩</text>
+					<image class="home-img" :src="i >= tasks.length ? '' : 'http://47.110.45.52:8085' + tasks[i].map1" mode="aspectFit"></image>
+					<view class="home-title">{{i >= tasks.length ? '暂无任务' : tasks[i].name}}</view>
+					<text class="home-sub-title">{{i >= tasks.length ? '-' : tasks[i].description}}</text>
 				</view>
 			</view>
 		</view>
@@ -30,14 +18,46 @@
 	export default {
 		data() {
 			return {
-				title: 'Hello'
+				title: 'Hello',
+				tasks: [],
+				colClasses: ['bg-red', 'bg-orange', 'bg-green']
 			}
 		},
 		onLoad() {
-
+			uni.request({
+				url: 'http://47.110.45.52:8085/api/task/task',
+				success: (res) => {
+					this.tasks = res.data.list
+				}
+			})
+		},
+		computed: {
+			colClass() {
+				return function(i) {
+					let imgC = 'bg-disabled'
+					if(this.tasks.length > i) {
+						imgC = this.colClasses[i]
+					}
+					return {
+						[imgC]: true
+					}
+				}
+			}
 		},
 		methods: {
-
+			openDetail(i) {
+				if(i >= this.tasks.length) {
+					return
+				}
+				uni.createSelectorQuery().select('#home').fields({
+					size: true,
+					scrollOffset: true
+				}, (data) => {
+					uni.navigateTo({
+						url: '/pages/task-detail/task-detail?w='+data.width+'&h='+data.height+'&task=' + encodeURIComponent(JSON.stringify(this.tasks[i]))
+					})
+				}).exec();
+			}
 		}
 	}
 </script>
