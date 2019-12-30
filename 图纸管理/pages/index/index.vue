@@ -5,7 +5,11 @@
 				  v-bind:class="{'bg-disable': tasks.length <= i, 'bg-red': i === 0 && tasks.length > i, 'bg-orange': i === 1 && tasks.length > i, 'bg-green': i === 2 && tasks.length > i}"
 				  @click="openDetail(i)">
 				<view class="flex-middle">
-					<image class="home-img" :src="i >= tasks.length ? '' : 'http://47.110.45.52:8085' + tasks[i].map1" mode="aspectFit"></image>
+					<image v-if="i === 0 && i < tasks.length" src="../../static/img1.svg" class="home-img" mode="aspectFit"></image>
+					<image v-if="i === 1 && i < tasks.length" src="../../static/img2.svg" class="task-img" mode="aspectFit"></image>
+					<image v-if="i === 2 && i < tasks.length" src="../../static/img3.svg" class="task-img" mode="aspectFit"></image>
+					<image v-if="tasks.length <= i" src="../../static/disable.svg" class="task-img"></image>
+<!--					<image class="home-img" :src="i >= tasks.length ? '' : 'http://47.110.45.52:8085' + tasks[i].map1" mode="aspectFit"></image>-->
 					<view class="home-title">{{i >= tasks.length ? '暂无任务' : tasks[i].name}}</view>
 					<text class="home-sub-title">{{i >= tasks.length ? '-' : tasks[i].description}}</text>
 				</view>
